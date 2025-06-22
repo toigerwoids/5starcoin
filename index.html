@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>Untitled</title>
+  
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>5-star rating ⭐⭐⭐⭐⭐</title>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <style>
+        @font-face {
+            font-family: 'Sticky-Bold';
+            src: url('https://cdn.jsdelivr.net/gh/toigerwoids/handwrittenfont@main/Sticky-Bold.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Sticky-Bold', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Logo/Title Section */
+        .logo-section {
+            margin-bottom: 40px;
+        }
+
+        .tagline {
+            color: #666;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            margin-top: 10px;
+        }
+
+        h1 {
+            font-size: 3em;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: normal;
+        }
+
+        .stars {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            margin-bottom: 10px;
+        }
+
+        .star-img {
+            width: 40px;
+            height: 40px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .rating-text {
+            font-size: 1.3em;
+            color: #333;
+            font-weight: normal;
+        }
+
+        .review-count-text {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .gooble-logo {
+            width: 150px;
+            height: 50px;
+            margin: 0 0px;
+            vertical-align: middle;
+            object-fit: contain;
+        }
+
+        .rating-count {
+            color: #4285f4;
+            font-weight: bold;
+        }
+
+        /* Bottom buttons - now contains all buttons */
+        .bottom-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 40px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: #4285f4;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-family: inherit;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: #3367d6;
+            transform: translateY(-1px);
+        }
+
+        .btn-buy { background: #4285f4; }
+        .btn-chart { background: #ea4335; }
+        .btn-review { background: #34a853; }
+        .btn-community { background: #7289da; }
+
+        .btn-buy:hover { background: #3367d6; }
+        .btn-chart:hover { background: #d33b2c; }
+        .btn-review:hover { background: #2d7a46; }
+        .btn-community:hover { background: #5b6eae; }
+
+        /* Contract Address Box */
+        .contract-box {
+            background: white;
+            border: 3px solid #333;
+            border-radius: 12px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.2s;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .contract-box:hover {
+            background: #f0f8ff;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .contract-address {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #333;
+            word-break: break-all;
+            flex: 1;
+            text-align: left;
+        }
+
+        .copy-icon {
+            color: #4285f4;
+            margin-left: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+        }
+
+        .copy-message {
+            color: #34a853;
+            font-size: 1em;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.3s;
+            text-align: center;
+        }
+
+        .copy-message.show {
+            opacity: 1;
+        }
+
+        /* Review Box */
+        .review-section {
+            background: #f8f9fa;
+            border: 3px solid #333;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .review-box-title {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .review-stars {
+            display: flex;
+            justify-content: center;
+            gap: 3px;
+            margin-bottom: 20px;
+        }
+
+        .review-stars .star-img {
+            width: 30px;
+            height: 30px;
+        }
+
+        .review-section-rating {
+            color: #666;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .review-section-rating .rating-text {
+            font-size: 1.3em;
+            color: #333;
+            font-weight: normal;
+        }
+
+        .review-section-rating .review-count-text {
+            color: #666;
+            font-size: 1.1em;
+        }
+
+        .review-section-rating .rating-count {
+            color: #4285f4;
+            font-weight: bold;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 1em;
+            background: white;
+            text-transform: lowercase;
+        }
+
+        input::placeholder, textarea::placeholder {
+            text-transform: none;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #4285f4;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background: #34a853;
+            margin-bottom: 10px;
+        }
+
+        .submit-btn:hover {
+            background: #2d7a46;
+        }
+
+        .error-message {
+            color: #ea4335;
+            font-size: 0.9em;
+            display: none;
+        }
+
+        /* Reviews List */
+        .reviews-list {
+            max-height: 300px;
+            overflow-y: auto;
+            text-align: left;
+        }
+
+        .review-item {
+            background: white;
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .review-item-stars {
+            display: flex;
+            gap: 2px;
+            margin-bottom: 5px;
+        }
+
+        .review-item-stars .star-img {
+            width: 16px;
+            height: 16px;
+        }
+
+        .review-author-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 5px;
+        }
+
+        .review-author {
+            font-weight: bold;
+            color: #4285f4;
+            font-size: 0.9em;
+        }
+
+        .review-time {
+            color: #999;
+            font-size: 0.8em;
+        }
+
+        .review-content {
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.4;
+        }
+
+        .delete-btn {
+            background: #ea4335;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            font-size: 0.8em;
+            margin-top: 5px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .delete-btn:hover {
+            background: #d33b2c;
+        }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .bottom-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .bottom-buttons button {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            h1 { font-size: 2.5em; }
+            .star-img { width: 30px; height: 30px; }
+            .container { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Logo/Title Section -->
+        <div class="logo-section">
+            <h1>$5STAR COIN</h1>
+            <div class="stars">
+                <img src="https://i.imgur.com/Gls1CbI.png" alt="star" class="star-img">
+                <img src="https://i.imgur.com/Gls1CbI.png" alt="star" class="star-img">
+                <img src="https://i.imgur.com/Gls1CbI.png" alt="star" class="star-img">
+                <img src="https://i.imgur.com/Gls1CbI.png" alt="star" class="star-img">
+                <img src="https://i.imgur.com/Gls1CbI.png" alt="star" class="star-img">
+            </div>
+            <div style="font-size: 40px; margin: 10px 0;">the only coin with a perfect 5-star rating</div>
+            <div class="tagline">a 5-star rating, in most contexts, signifies the highest level of satisfaction or quality, indicating that something is excellent or outstanding.</div>
+        </div>
+
+        <!-- All buttons in one section -->
+        <div class="bottom-buttons">
+            <button class="btn-buy" onclick="alert('wagmi! 🚀\n\nconnect your wallet on your favorite dex!')">buy now</button>
+            <button class="btn-chart" onclick="alert('📈 always up and to the right!\n\n(not financial advice)')">chart</button>
+            <button class="btn-review" onclick="document.getElementById('reviewName').focus()">write a review</button>
+            <button class="btn-community" onclick="window.open('https://t.me/yourcommunity', '_blank')">X community</button>
+        </div>
+
+        <!-- Contract Address Box -->
+        <div class="contract-box" onclick="copyContract()">
+            <span class="contract-address" id="contractAddress">0x1234567890abcdef1234567890abcdef12345678</span>
+            <div class="copy-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2" stroke="currentColor" stroke-width="2" fill="none"/>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke="currentColor" stroke-width="2" fill="none"/>
+                </svg>
+            </div>
+        </div>
+        <div class="copy-message" id="copyMessage">copied!</div>
+
+        <!-- Review Section -->
+        <div class="review-section">
+            <h2 class="review-box-title">leave a <img src="https://i.imgur.com/9NpTLiq.png" alt="Gooble" class="gooble-logo"> 5-star review</h2>
+            <div class="review-stars">
+                <img src="https://i.imgur.com/Gls1CbI.png" alt="star" class="star-img">
+                <img src="https://i.imgur.com/Gls1CbI.png" alt="star" class="star-img">
+                <img src="https://i.imgur.com/Gls1CbI.png" alt="star" class="star-img">
+                <img src="https://i.imgur.com/Gls1CbI.png" alt="star" class="star-img">
+                <img src="https://i.imgur.com/Gls1CbI.png" alt="star" class="star-img">
+            </div>
+            <div class="review-section-rating">
+                <span class="rating-text">5.0</span>
+                <span class="review-count-text">rating from <span class="rating-count" id="reviewCount2">0</span> reviews</span>
+            </div>
+            <form id="reviewForm">
+                <input type="text" id="reviewName" placeholder="ur name" />
+                <textarea id="reviewText" placeholder="why did u give 5 stars?" required></textarea>
+                <button type="submit" class="submit-btn">submit review</button>
+                <div class="error-message" id="errorMessage">pls write something more positive!</div>
+            </form>
+            
+            <div class="reviews-list" id="reviewsList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCZeeSek1ABILX5FHMSI_jydj9VGvHYkkI",
+            authDomain: "star-review-39713.firebaseapp.com",
+            projectId: "star-review-39713",
+            storageBucket: "star-review-39713.firebasestorage.app",
+            messagingSenderId: "81397243435",
+            appId: "1:81397243435:web:82f592cccac9f33eac546e",
+            measurementId: "G-V8J5S47SZY"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // Admin password
+        const ADMIN_PASSWORD = "123";
+
+        // Get user's fingerprint
+        function getUserFingerprint() {
+            const nav = window.navigator;
+            const screen = window.screen;
+            const fingerprint = [
+                nav.userAgent,
+                nav.language,
+                screen.height,
+                screen.width,
+                screen.pixelDepth,
+                new Date().getTimezoneOffset(),
+                nav.hardwareConcurrency,
+                nav.platform
+            ].join('|');
+            
+            let hash = 0;
+            for (let i = 0; i < fingerprint.length; i++) {
+                const char = fingerprint.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return Math.abs(hash).toString();
+        }
+
+        // Prohibited content patterns
+        const prohibitedPatterns = [
+            // Profanity and slurs - catches any word containing these
+            /(fuck|shit|ass|damn|hell|crap|bitch|bastard|dick|cock|pussy|cunt|fag|retard|nigger|nigga|spic|chink|gook|kike|dyke|tranny)/gi,
+            // Sexual content
+            /(sex|porn|nude|naked|horny|penis|vagina|boob|tit|anal|oral|masturbat|ejaculat|orgasm|erotic|xxx|nsfw)/gi,
+            // Violence and hate
+            /(kill|murder|rape|assault|hate|nazi|hitler|holocaust|genocide|lynch|terrorist|bomb|shoot|stab|torture|abuse)/gi,
+            // Discrimination
+            /(racist|racism|sexist|sexism|homophob|transphob|islamophob|xenophob|bigot|discriminat)/gi,
+            // Death and self-harm
+            /(suicide|suicidal|die|dying|death|dead|hang|hanging|overdose|self.?harm|cut|cutting|bleed|bleeding)/gi,
+            // Scams and crypto negativity
+            /(scam|fraud|steal|hack|phishing|malware|virus|illegal|rug|rugged|rugpull|ponzi|pyramid|scheme|honeypot|fake|stolen|suck)/gi,
+            // Drugs
+            /(drug|cocaine|heroin|meth|weed|marijuana|crack|lsd|mdma|ecstasy|pill)/gi,
+            // Spam patterns
+            /\b(click here|free money|guaranteed|winner|prize|viagra|cialis|pills|enlargement|casino|lottery)\b/gi,
+            // URLs and emails
+            /(https?:\/\/|www\.|@|\.com|\.org|\.net|\.io)/gi
+        ];
+
+        // Check if content is appropriate
+        function isContentAppropriate(text) {
+            const lowerText = text.toLowerCase();
+            
+            for (const pattern of prohibitedPatterns) {
+                if (pattern.test(text)) {
+                    return false;
+                }
+            }
+            
+            const capsRatio = (text.match(/[A-Z]/g) || []).length / text.length;
+            if (capsRatio > 0.5 && text.length > 10) {
+                return false;
+            }
+            
+            if (/(.)\1{4,}/i.test(text)) {
+                return false;
+            }
+            
+            return true;
+        }
+
+        // Create stars HTML
+        function createStarsHtml() {
+            let stars = '';
+            for (let i = 0; i < 5; i++) {
+                stars += '<img src="https://i.imgur.com/Gls1CbI.png" alt="star" class="star-img">';
+            }
+            return stars;
+        }
+
+        // Get time ago string
+        function getTimeAgo(timestamp) {
+            if (!timestamp) return '';
+            
+            const now = new Date();
+            const reviewTime = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            const diffMs = now - reviewTime;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'just now';
+            if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+            if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+            if (diffDays < 30) return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+            return reviewTime.toLocaleDateString();
+        }
+
+        // Load and display reviews from Firebase
+        async function loadReviews() {
+            const reviewsList = document.getElementById('reviewsList');
+            const reviewCount2 = document.getElementById('reviewCount2');
+            
+            try {
+                // Listen to reviews in real-time
+                db.collection('reviews')
+                    .orderBy('timestamp', 'desc')
+                    .onSnapshot((snapshot) => {
+                        const reviews = [];
+                        snapshot.forEach((doc) => {
+                            reviews.push({ id: doc.id, ...doc.data() });
+                        });
+                        
+                        console.log('Loaded reviews:', reviews); // Debug log
+                        
+                        // Update count in the review section only
+                        reviewCount2.textContent = reviews.length;
+                        
+                        // Render reviews
+                        if (reviews.length === 0) {
+                            reviewsList.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">be the first to review!</p>';
+                        } else {
+                            reviewsList.innerHTML = reviews.map((review, index) => `
+                                <div class="review-item" data-id="${review.id}">
+                                    <div class="review-item-stars">${createStarsHtml()}</div>
+                                    <div class="review-author-line">
+                                        <div class="review-author">${review.name || 'anonymous'}</div>
+                                        <div class="review-time">${getTimeAgo(review.timestamp)}</div>
+                                    </div>
+                                    <div class="review-content">${review.content}</div>
+                                    ${isAdmin() ? `<button class="delete-btn" onclick="deleteReview('${review.id}')">delete</button>` : ''}
+                                </div>
+                            `).join('');
+                        }
+                    }, (error) => {
+                        console.error('Error loading reviews:', error);
+                        // Try loading without orderBy if there's an index issue
+                        db.collection('reviews').get().then((snapshot) => {
+                            const reviews = [];
+                            snapshot.forEach((doc) => {
+                                reviews.push({ id: doc.id, ...doc.data() });
+                            });
+                            
+                            // Sort manually
+                            reviews.sort((a, b) => {
+                                const timeA = a.timestamp ? (a.timestamp.toDate ? a.timestamp.toDate() : new Date(a.timestamp)) : new Date(0);
+                                const timeB = b.timestamp ? (b.timestamp.toDate ? b.timestamp.toDate() : new Date(b.timestamp)) : new Date(0);
+                                return timeB - timeA;
+                            });
+                            
+                            // Update count in the review section only
+                            reviewCount2.textContent = reviews.length;
+                            
+                            // Render reviews
+                            if (reviews.length === 0) {
+                                reviewsList.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">be the first to review!</p>';
+                            } else {
+                                reviewsList.innerHTML = reviews.map((review, index) => `
+                                    <div class="review-item" data-id="${review.id}">
+                                        <div class="review-item-stars">${createStarsHtml()}</div>
+                                        <div class="review-author-line">
+                                            <div class="review-author">${review.name || 'anonymous'}</div>
+                                            <div class="review-time">${getTimeAgo(review.timestamp)}</div>
+                                        </div>
+                                        <div class="review-content">${review.content}</div>
+                                        ${isAdmin() ? `<button class="delete-btn" onclick="deleteReview('${review.id}')">delete</button>` : ''}
+                                    </div>
+                                `).join('');
+                            }
+                        });
+                    });
+            } catch (error) {
+                console.error('Error setting up reviews listener:', error);
+            }
+        }
+
+        // Check if user has already reviewed
+        async function hasUserReviewed(fingerprint) {
+            const snapshot = await db.collection('reviews')
+                .where('fingerprint', '==', fingerprint)
+                .get();
+            return !snapshot.empty;
+        }
+
+        // Submit review to Firebase
+        async function submitReview(name, content, fingerprint) {
+            await db.collection('reviews').add({
+                name: name || 'anonymous',
+                content: content,
+                fingerprint: fingerprint,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+
+        // Delete review (admin only)
+        window.deleteReview = async function(reviewId) {
+            if (!isAdmin()) {
+                alert('admin access required');
+                return;
+            }
+            
+            if (!confirm('delete this review?')) {
+                return;
+            }
+            
+            try {
+                await db.collection('reviews').doc(reviewId).delete();
+                console.log('Review deleted successfully');
+            } catch (error) {
+                console.error('Error deleting review:', error);
+                alert('Error deleting review. Check console and Firebase permissions.');
+            }
+        }
+
+        // Copy contract address function
+        window.copyContract = async function() {
+            const contractAddress = document.getElementById('contractAddress').textContent;
+            const copyMessage = document.getElementById('copyMessage');
+            
+            try {
+                await navigator.clipboard.writeText(contractAddress);
+                copyMessage.classList.add('show');
+                setTimeout(() => {
+                    copyMessage.classList.remove('show');
+                }, 2000);
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = contractAddress;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                copyMessage.classList.add('show');
+                setTimeout(() => {
+                    copyMessage.classList.remove('show');
+                }, 2000);
+            }
+        }
+
+        // Admin functions
+        function isAdmin() {
+            return localStorage.getItem('isAdmin') === 'true';
+        }
+
+        function loginAdmin() {
+            const password = prompt('enter admin password:');
+            if (password === ADMIN_PASSWORD) {
+                localStorage.setItem('isAdmin', 'true');
+                localStorage.setItem('adminFingerprint', getUserFingerprint());
+                loadReviews(); // Reload to show delete buttons
+                alert('admin access granted - you can now post unlimited reviews and delete any review');
+            } else {
+                alert('incorrect password');
+            }
+        }
+        
+        function logoutAdmin() {
+            localStorage.removeItem('isAdmin');
+            localStorage.removeItem('adminFingerprint');
+            loadReviews();
+            alert('logged out of admin mode');
+        }
+
+        // Handle form submission
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load reviews on page load
+            loadReviews();
+
+            // Form submission
+            document.getElementById('reviewForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const errorMsg = document.getElementById('errorMessage');
+                errorMsg.style.display = 'none';
+                
+                const name = document.getElementById('reviewName').value.trim().toLowerCase();
+                const content = document.getElementById('reviewText').value.trim().toLowerCase();
+                
+                if (!content) return;
+                
+                // Check content appropriateness
+                if (!isContentAppropriate(name) || !isContentAppropriate(content)) {
+                    errorMsg.style.display = 'block';
+                    return;
+                }
+                
+                // Check if user already reviewed (skip for admin)
+                const userFingerprint = getUserFingerprint();
+                const isAdminUser = isAdmin();
+                
+                if (!isAdminUser && await hasUserReviewed(userFingerprint)) {
+                    alert('you\'ve already left a review! one review per person to keep it fair 🌟');
+                    return;
+                }
+                
+                // Submit review
+                try {
+                    await submitReview(name, content, userFingerprint);
+                    console.log('Review submitted successfully');
+                    
+                    // Clear form
+                    document.getElementById('reviewName').value = '';
+                    document.getElementById('reviewText').value = '';
+                } catch (error) {
+                    console.error('Error submitting review:', error);
+                    alert('Error submitting review. Please try again.');
+                }
+            });
+
+            // Add admin login shortcut (Ctrl+Shift+A)
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey && e.shiftKey && e.key === 'A') {
+                    if (isAdmin()) {
+                        logoutAdmin();
+                    } else {
+                        loginAdmin();
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+<!-- partial -->
+  
+</body>
+</html>
